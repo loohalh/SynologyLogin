@@ -9,7 +9,7 @@ loginFileBackup="./"
 nasFileBackup="/usr/syno/synoman/login-backup.gz"
 nasFile="/usr/syno/synoman/"
 
-echo -e "\n---- One click optimization plan for synology 7.0.x login. by looha ----\n"
+echo -e "\n---- One click optimization plan for synology 7.1(42661) login. by looha ----\n"
 
 if [ "$(ls -A $sourceSecureWebmanFile)" ]; then
      echo -e "Webman Files are ready"
@@ -101,6 +101,7 @@ send \"cd /usr/syno/synoman/tmp/webman \r\"
 send \"cp login-vue.js /usr/syno/synoman/webman \r\"
 send \"cd /usr/syno/synoman/webman \r\"
 send \"gzip -c login-vue.js > login-vue.js.gz \r\"
+
 
 send \"cd /usr/syno/synoman/webman/login/css \r\"
 send \"cp login.css login.css.gz /usr/syno/synoman/login-backup/webman/login/css \r\"
