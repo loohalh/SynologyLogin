@@ -12,6 +12,9 @@
 * 在使用前，请务必在群晖系统控制面板-终端机和SNMP中启动SSH功能
 * 请注意，登录时需要输入root帐户密码。如果您没有root帐户密码，请打开root文件夹运行root.sh脚本来启用root帐户并设置root密码
 
+<img width="1432" alt="WechatIMG2401" src="https://github.com/loohalh/SynologyLogin/assets/16890588/9f584b92-3884-4164-bdec-6539748e34b4">
+
+
 
 
 
