@@ -6,7 +6,7 @@
 * Before use, the SSH function must be activated on the control panel terminal of the synology system
 * Note that you need to enter the root account password for the login. If you do not have a root account password, you can use the root. sh script in the root file to enable the root account and set the root account password
 
-# 群晖一键登录一键优化
+# 群晖登录一键优化
 # 支持版本：7.0, 7.0.1, 7.1, 7.1.1 以及 7.2
 * 打开相应版本的文件夹并执行对应的shell脚本即可
 * 使用前，请务必在群晖系统控制面板-终端机和SNMP中启动SSH功能
