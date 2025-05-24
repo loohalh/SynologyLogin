@@ -1,6 +1,9 @@
 #!/bin/bash
+# by looha
+
 
 user="root"
+port="22"
 sourceSecureWebmanFile="webman/"
 sourceSecureMobileFile="mobile/"
 sourceFile="tmp/"
@@ -14,18 +17,17 @@ echo -e "\n---- One click optimization plan for synology 7.1(42661) login. by lo
 if [ "$(ls -A $sourceSecureWebmanFile)" ]; then
      echo -e "Webman Files are ready"
 else
-    echo "xxxxx- Webman Files is not ready xxxxx-"
+    echo "\nxxxxx- Error: Webman Files is not ready xxxxx-"
     exit 1
 fi
 
 if [ "$(ls -A $sourceSecureMobileFile)" ]; then
      echo "mobile Files are ready"
 else
-    echo -e "xxxxx- mobile Files is not ready xxxxx-\n"
+    echo -e "\nxxxxx- Error: mobile Files is not ready xxxxx-\n"
     exit 1
 fi
 
-find . -name '*.DS_Store' -type f -delete
 
 echo -e "\n*****************************************************************"
 echo -e "* You are about to enter the synology IP and root password      *"
@@ -36,25 +38,84 @@ echo -e "*****************************************************************\n"
 
 read -p "Please enter the synology IP：
 for example 192.168.1.1 : " host
-read -p "Please enter the correct password for the synology root : " passwd
+read -p "Please enter the correct password for the synology root :
+" passwd
+
 if [ -n "$host" -a -n "$passwd" ]
 then
     echo -e "\n**** Synology's IP is $host, and the root password is $passwd ****"
 else
-    echo "xxxxx- Synology IP or root password not entered xxxxx-"
+    echo "\nxxxxx- Error:Synology IP or root password not entered xxxxx-"
     exit 1
+fi
+
+ssh-keygen -R "$host"
+
+
+# Check for connectivity
+echo -e "\n*********** Check synology connection status ***********\n"
+ping -c 1 $host > /dev/null
+
+if [ $? -eq 0 ]; then
+  echo "The synology connect is ok"
+else
+  echo -e "\nxxxxx- Error: The synology cannot connect. Please ensure that the synology is turned on and port 22 is open xxxxx-\n"
+  exit
+fi
+
+echo -e "\n*********** Verifying account password ***********\n"
+
+expect << EOF
+spawn -noecho ssh -p $port $user@$host
+expect {
+    "*assword:" {
+        send "$passwd\r"
+        expect {
+            "Permission denied" {
+                exit 1
+            }
+            "*yes/no*" {
+                send "yes\r"
+                exp_continue
+            }
+            "$user@" {
+                send "exit\r"
+            }
+            timeout {
+                exit 1
+            }
+        }
+    }
+    "*yes/no*" {
+        send "yes\r"
+        exp_continue
+    }
+    
+    timeout {
+        exit 1
+    }
+}
+EOF
+
+#Verification results
+if [ $? -eq 1 ]; then
+    echo -e "\nxxxxx- Error: Account password error xxxxx-\n"
+    exit 0
 fi
 
 
 echo -e "\n********************** start **************************************\n"
 
-
+#Prepare the documents
 if [ "$(ls -A $tmp)" ]; then rm -rf tmp; fi
 mkdir $sourceFile
-
-echo -e "\n***************** upload resources ... ****************\n"
 cp -r $sourceSecureWebmanFile $sourceSecureMobileFile $sourceFile
 
+find . -name '*.DS_Store' -type f -delete
+
+#--------------------------------------------------------------
+
+echo -e "\n***************** upload resources ... ****************\n"
 expect -c "
 set timeout 30
 spawn -noecho scp -r $sourceFile $user@$host:$nasFile
